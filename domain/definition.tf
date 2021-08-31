@@ -12,15 +12,17 @@ resource "aws_route53_zone" "dns_manager" {
 }
 
 resource "aws_acm_certificate" "primary_wildcard_cert" {
-  domain_name       = var.name
-  validation_method = "DNS"
-  tags              = local.common_tags
+  domain_name               = var.name
+  subject_alternative_names = ["*.${var.name}"]
+  validation_method         = "DNS"
+  tags                      = local.common_tags
 }
 
-// Perform DNS validation
-// NOTE: Just performing this will not validate successfully.
+// Add the DNS validation records to the Hosted zone.
+// Note that this alone is not enough to validate the ACM cert.
 // The NS records of the main R53 zone must be configured with the domain
-// provider manually.
+// provider manually by the user.
+// After that, ACM will be able to validate & issue the certificate.
 resource "aws_route53_record" "acm_cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.primary_wildcard_cert.domain_validation_options : dvo.domain_name => {
@@ -37,9 +39,4 @@ resource "aws_route53_record" "acm_cert_validation" {
   ttl     = 60
   type    = each.value.type
   zone_id = aws_route53_zone.dns_manager.zone_id
-}
-
-resource "aws_acm_certificate_validation" "primary_cert_validation" {
-  certificate_arn         = aws_acm_certificate.primary_wildcard_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.acm_cert_validation : record.fqdn]
 }

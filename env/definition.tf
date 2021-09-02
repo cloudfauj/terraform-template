@@ -5,6 +5,8 @@ locals {
   }
 }
 
+data "aws_availability_zones" "available" {}
+
 # VPC
 resource "aws_vpc" "main_vpc" {
   cidr_block = var.main_vpc_cidr_block
@@ -36,10 +38,11 @@ resource "aws_subnet" "compute" {
 }
 
 resource "aws_subnet" "apps_alb" {
-  count      = 2
-  vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = cidrsubnet(aws_vpc.main_vpc.cidr_block, 9, count.index + 1)
-  tags       = local.common_tags
+  count             = 2
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = cidrsubnet(aws_vpc.main_vpc.cidr_block, 9, count.index + 1)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags              = local.common_tags
 }
 
 # ECS Task IAM role shared by all applications in the environment

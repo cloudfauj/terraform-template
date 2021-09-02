@@ -35,6 +35,13 @@ resource "aws_subnet" "compute" {
   tags       = local.common_tags
 }
 
+resource "aws_subnet" "apps_alb" {
+  count      = 2
+  vpc_id     = aws_vpc.main_vpc.id
+  cidr_block = cidrsubnet(aws_vpc.main_vpc.cidr_block, 9, count.index + 1)
+  tags       = local.common_tags
+}
+
 # ECS Task IAM role shared by all applications in the environment
 resource "aws_iam_role" "ecs_task_exec_role" {
   name               = "${local.common_tags.Name}-ecs-task-exec-role"

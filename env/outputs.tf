@@ -17,3 +17,7 @@ output "compute_subnets" {
 output "ecs_task_execution_role_arn" {
   value = aws_iam_role.ecs_task_exec_role.arn
 }
+
+output "alb_subnets" {
+  value = aws_subnet.apps_alb.*.id
+}

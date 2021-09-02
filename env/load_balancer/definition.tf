@@ -26,20 +26,13 @@ resource "aws_security_group" "env_apps_alb" {
   }
 }
 
-resource "aws_subnet" "env_apps_alb" {
-  count      = 2
-  vpc_id     = var.vpc_id
-  cidr_block = var.alb_subnet_cidrs[count.index]
-  tags       = local.common_tags
-}
-
 resource "aws_alb" "env_apps" {
   name               = var.env_name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.env_apps_alb.id]
   tags               = local.common_tags
-  subnets            = aws_subnet.env_apps_alb.*.id
+  subnets            = var.alb_subnets
 }
 
 resource "aws_alb_listener" "env_apps_http" {

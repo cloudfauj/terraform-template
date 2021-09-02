@@ -42,7 +42,11 @@ resource "aws_subnet" "apps_alb" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = cidrsubnet(aws_vpc.main_vpc.cidr_block, 9, count.index + 1)
   availability_zone = data.aws_availability_zones.available.names[count.index]
-  tags              = local.common_tags
+
+  tags = {
+    Name    = "${var.env_name}-alb-${count.index}"
+    manager = local.common_tags.manager
+  }
 }
 
 # ECS Task IAM role shared by all applications in the environment

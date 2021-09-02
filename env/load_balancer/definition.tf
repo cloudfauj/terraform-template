@@ -9,7 +9,11 @@ resource "aws_security_group" "env_apps_alb" {
   name        = "${var.env_name}-apps-alb"
   description = "${var.env_name} applications ALB traffic control"
   vpc_id      = var.vpc_id
-  tags        = local.common_tags
+
+  tags = {
+    Name    = "${var.env_name}-alb"
+    manager = local.common_tags.manager
+  }
 
   ingress {
     from_port   = 443
@@ -33,22 +37,6 @@ resource "aws_alb" "env_apps" {
   security_groups    = [aws_security_group.env_apps_alb.id]
   tags               = local.common_tags
   subnets            = var.alb_subnets
-}
-
-resource "aws_alb_listener" "env_apps_http" {
-  load_balancer_arn = aws_alb.env_apps.arn
-  protocol          = "HTTP"
-  port              = 80
-
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
 }
 
 resource "aws_alb_listener" "env_apps_https" {

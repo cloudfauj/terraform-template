@@ -82,4 +82,14 @@ resource "aws_ecs_service" "main_app" {
     assign_public_ip = true
     security_groups  = [aws_security_group.main_app_sg.id]
   }
+
+  // Only associate Load balancer if target group is supplied.
+  dynamic "load_balancer" {
+    for_each = var.lb_target_group_arns
+    content {
+      target_group_arn = load_balancer.value
+      container_name   = var.app_name
+      container_port   = var.ingress_port
+    }
+  }
 }

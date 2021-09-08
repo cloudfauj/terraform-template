@@ -41,3 +41,9 @@ variable "memory" {
 variable "ecr_image" {
   description = "The ECR docker image to deploy as part of application, including the tag"
 }
+
+variable "lb_target_group_arns" {
+  default     = []
+  type        = list(string)
+  description = "ARNs of the Target groups through which ALBs forward traffic to app ecs service. Max 1 allowed."
+}

@@ -20,7 +20,7 @@ resource "aws_route53_record" "app_url" {
 }
 
 resource "aws_alb_target_group" "alb_to_ecs_service" {
-  name        = local.common_tags.Name
+  name        = replace(local.common_tags.Name, "_", "-")
   vpc_id      = var.env_vpc_id
   port        = 80
   protocol    = "HTTP"

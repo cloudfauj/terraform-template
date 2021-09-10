@@ -9,3 +9,7 @@ output "name_servers" {
 output "ssl_cert_arn" {
   value = aws_acm_certificate.primary_wildcard_cert.arn
 }
+
+output "apex_domain" {
+  value = var.name
+}
